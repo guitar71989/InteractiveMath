@@ -44,8 +44,8 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	const LessonView = __webpack_require__(9);
-	const Lesson = __webpack_require__(7);
+	const LessonView = __webpack_require__(1);
+	const Lesson = __webpack_require__(2);
 
 	document.addEventListener('DOMContentLoaded', function(){
 	  //Setup instructions
@@ -66,16 +66,62 @@
 
 
 /***/ },
-/* 1 */,
-/* 2 */,
-/* 3 */,
-/* 4 */,
-/* 5 */,
-/* 6 */,
-/* 7 */
+/* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	const Point = __webpack_require__(10);
+	const Lesson = __webpack_require__(2);
+
+	const LessonView = function(ctx, instructions){
+	    this.lesson = new Lesson;
+	    this.instructions = instructions;
+	    this.ctx = ctx;
+
+	  };
+
+	  LessonView.prototype.start = function(){
+
+	    const func = this;
+
+	    this.lesson.populatePoints(this.ctx);
+
+	    this.lesson.setInstructions(this.instructions);
+
+	    document.addEventListener('mousemove', function(e){
+	      const mouseX = Math.floor((e.clientX - (window.innerWidth - 500)/2 - 250) / 20);
+	      const mouseY = Math.floor(13 - (e.clientY - 85)/ 20);
+	      const mousePos = [mouseX, mouseY];
+	      func.lesson.checkHover(mousePos);
+	    }, false);
+
+
+	    document.addEventListener('click', function(e){
+	      const mouseX = Math.floor((e.clientX - (window.innerWidth - 500)/2 - 250) / 20);
+	      const mouseY = Math.floor(13 - (e.clientY - 85)/ 20);
+	      const mousePos = [mouseX, mouseY];
+
+	      if(func.lesson.checkAnswer(mousePos)){
+	        alert("Correct!");
+	        func.lesson.setInstructions(func.instructions);
+	      } else {
+	        alert("Try again!");
+	      }
+	    }, false);
+
+
+	    setInterval(function(){
+	      func.lesson.draw(func.ctx);
+	    }, 20);
+
+	  };
+
+	  module.exports = LessonView;
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	const Point = __webpack_require__(3);
 
 	const Lesson = function(){
 	  this.pointsArray = [];
@@ -91,7 +137,10 @@
 
 
 	Lesson.prototype.setInstructions = function(instructions){
-	  this.randomPos = [Math.floor(Math.random()*12), Math.floor(Math.random()*12)];
+	  const plusOrMinus1 = Math.random() < 0.5 ? -1 : 1;
+	  const plusOrMinus2 = Math.random() < 0.5 ? -1 : 1;
+
+	  this.randomPos = [Math.floor(Math.random()*12*plusOrMinus1), Math.floor(Math.random()*12*plusOrMinus2)];
 
 	  if(this.level === 1){
 	    instructions.innerHTML = `<h1>Graph points on the coordinate plane</h1><p>Find (${this.randomPos[0]}, ${this.randomPos[1]})</p>`;
@@ -99,11 +148,7 @@
 	};
 
 	Lesson.prototype.checkAnswer = function(mousePos){
-	  if(this.randomPos[0] === mousePos[0] && this.randomPos[1] === mousePos[1]){
-	    alert("Correct!");
-	  } else {
-	    alert("Try again!");
-	  }
+	  return (this.randomPos[0] === mousePos[0] && this.randomPos[1] === mousePos[1]);
 	};
 
 	Lesson.prototype.drawGrid = function(ctx){
@@ -175,7 +220,6 @@
 	    this.pointsArray.forEach( (point) => {
 	      if (point.isHovered(mousePos)){
 	        point.isHovering = true;
-	        console.log(point.graphPos);
 	      }
 	      else {
 	        point.isHovering = false;
@@ -247,54 +291,7 @@
 
 
 /***/ },
-/* 8 */,
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	const Lesson = __webpack_require__(7);
-
-	const LessonView = function(ctx, instructions){
-	    this.lesson = new Lesson;
-	    this.instructions = instructions;
-	    this.ctx = ctx;
-
-	  };
-
-	  LessonView.prototype.start = function(){
-
-	    const func = this;
-
-	    this.lesson.populatePoints(this.ctx);
-
-	    this.lesson.setInstructions(this.instructions);
-
-	    document.addEventListener('mousemove', function(e){
-	      const mouseX = Math.floor((e.clientX - (window.innerWidth - 500)/2 - 250) / 20);
-	      const mouseY = Math.floor(13 - (e.clientY - 85)/ 20);
-	      const mousePos = [mouseX, mouseY];
-	      func.lesson.checkHover(mousePos);
-	    }, false);
-
-
-	    document.addEventListener('click', function(e){
-	      const mouseX = Math.floor((e.clientX - (window.innerWidth - 500)/2 - 250) / 20);
-	      const mouseY = Math.floor(13 - (e.clientY - 85)/ 20);
-	      const mousePos = [mouseX, mouseY];
-	      func.lesson.checkAnswer(mousePos);
-	    }, false);
-
-
-	    setInterval(function(){
-	      func.lesson.draw(func.ctx);
-	    }, 20);
-
-	  };
-
-	  module.exports = LessonView;
-
-
-/***/ },
-/* 10 */
+/* 3 */
 /***/ function(module, exports) {
 
 	const Point = function(options) {
