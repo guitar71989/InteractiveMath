@@ -1,0 +1,14 @@
+body {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+#instructions {
+  text-align: center;
+  font-family: monospace;
+}
+
+h1 {
+  line-height: 0
+}
