@@ -49,16 +49,19 @@
 
 	document.addEventListener('DOMContentLoaded', function(){
 	  //Setup instructions
-	  const instructions = document.getElementById("instructions");
+	  const instructions = document.getElementById("instructions-text");
 
 	  //Setup graph
+	  let score = 0;
 	  const canvas = document.getElementById("graph-canvas");
 	  const ctx = canvas.getContext("2d");
 	  ctx.canvas.width  = 500;
 	  ctx.canvas.height = 500;
 	  ctx.canvas.style.width  = '500px';
 	  ctx.canvas.style.height = '500px';
-	  const lessonView = new LessonView(ctx, instructions);
+
+
+	  const lessonView = new LessonView(ctx, instructions, score);
 	  lessonView.start();
 
 	  window.pointsArray = lessonView.lesson.pointsArray;
@@ -71,11 +74,11 @@
 
 	const Lesson = __webpack_require__(2);
 
-	const LessonView = function(ctx, instructions){
+	const LessonView = function(ctx, instructions, score){
 	    this.lesson = new Lesson;
 	    this.instructions = instructions;
 	    this.ctx = ctx;
-
+	    this.score = score;
 	  };
 
 	  LessonView.prototype.start = function(){
@@ -86,26 +89,29 @@
 
 	    this.lesson.setInstructions(this.instructions);
 
-	    document.addEventListener('mousemove', function(e){
-	      const mouseX = Math.floor((e.clientX - (window.innerWidth - 500)/2 - 250) / 20);
-	      const mouseY = Math.floor(13 - (e.clientY - 85)/ 20);
+	    func.ctx.canvas.addEventListener('mousemove', function(e){
+	      const mouseX = Math.floor((e.clientX - func.ctx.canvas.getBoundingClientRect().left - 250) / 20);
+	      const mouseY = Math.floor(13 - (e.clientY - func.ctx.canvas.getBoundingClientRect().top - 10)/ 20);
 	      const mousePos = [mouseX, mouseY];
 	      func.lesson.checkHover(mousePos);
 	    }, false);
 
 
-	    document.addEventListener('click', function(e){
-	      const mouseX = Math.floor((e.clientX - (window.innerWidth - 500)/2 - 250) / 20);
-	      const mouseY = Math.floor(13 - (e.clientY - 85)/ 20);
+	    func.ctx.canvas.addEventListener('click', function(e){
+	      const mouseX = Math.floor((e.clientX - func.ctx.canvas.getBoundingClientRect().left - 250) / 20);
+	      const mouseY = Math.floor(13 - (e.clientY - func.ctx.canvas.getBoundingClientRect().top - 10)/ 20);
 	      const mousePos = [mouseX, mouseY];
 
-	      if(func.lesson.checkAnswer(mousePos)){
+	      if (this.score === 3) {
+
+	      } else if(func.lesson.checkAnswer(mousePos)){
+	        this.score += 1;
 	        alert("Correct!");
 	        func.lesson.setInstructions(func.instructions);
 	      } else {
 	        alert("Try again!");
 	      }
-	    }, false);
+	    }.bind(this), false);
 
 
 	    setInterval(function(){
@@ -143,7 +149,8 @@
 	  this.randomPos = [Math.floor(Math.random()*12*plusOrMinus1), Math.floor(Math.random()*12*plusOrMinus2)];
 
 	  if(this.level === 1){
-	    instructions.innerHTML = `<h1>Graph points on the coordinate plane</h1><p>Find (${this.randomPos[0]}, ${this.randomPos[1]})</p>`;
+	    instructions.innerHTML = `<p id="instructions">Graph the point (${this.randomPos[0]}, ${this.randomPos[1]}) on the coordinate plane.</p>`;
+
 	  }
 	};
 

@@ -1,14 +1,197 @@
+
+ /* --- RESET --- */
+
+ html, body, header, nav, h1, a, ul, li,
+ strong, main, section, img, div, h2, p,
+ form, fieldset, label, input, textarea,
+ button, article, footer, small {
+   margin: 0;
+   padding: 0;
+   outline: 0;
+   border: 0;
+
+   text-align: inherit;
+   text-decoration: inherit;
+   vertical-align: inherit;
+   font: inherit;
+   box-sizing: content-box;
+   color: inherit;
+
+   background: transparent;
+ }
+
+ /* --- Body --- */
+
 body {
+  font-family: monospace;
   display: flex;
   align-items: center;
   flex-direction: column;
 }
 
-#instructions {
-  text-align: center;
-  font-family: monospace;
+ /* --- Header --- */
+
+ header {
+   width: 100%;
+   background: #6495ed;
+   border-bottom: 2px solid #ccc;
+ }
+
+nav {
+  color: white;
+  padding: 10px;
+  display: flex;
+  margin: 0 auto;
+  justify-content: flex-start;
+  width: 900px;
+  height: 40px;
 }
 
 h1 {
-  line-height: 0
+  line-height: 1
+}
+
+#icon {
+  height: 40px;
+  width: 40px;
+}
+
+#title {
+  font-family: monospace;
+  font-size: 16px;
+  padding: 15px 10px;
+}
+
+
+
+ /* --- Main --- */
+
+ main {
+   height: 610px;
+   width: 920px;
+ }
+
+
+#instructions {
+  display: block;
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+lesson {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+}
+
+score {
+  align-self: center;
+}
+
+canvas {
+  display: flex;
+  align-content: center;
+}
+
+canvas:hover {
+  cursor: pointer;
+}
+
+ /* --- Score --- */
+
+ .score-ctn, .level-ctn, .lines-ctn {
+   margin: 20px 0;
+ }
+
+ .score-title {
+   display: block;
+   background: #000080;
+   padding: 20px;
+   color: #fff;
+ }
+
+ .score-result {
+   display: block;
+   background: #fff;
+   padding: 20px;
+   border: 1px solid #ccc;
+ }
+
+ .level-title {
+   display: block;
+   background: #000080;
+   padding: 20px;
+   color: #fff;
+ }
+
+ .level-result {
+   display: block;
+   background: #fff;
+   padding: 20px;
+   border: 1px solid #ccc;
+ }
+
+ .lines-title {
+   display: block;
+   background: #000080;
+   padding: 20px;
+   color: #fff;
+ }
+
+ .lines-result {
+   display: block;
+   background: #fff;
+   padding: 20px;
+   border: 1px solid #ccc;
+ }
+
+
+
+ /* --- Footer --- */
+
+
+footer {
+ border-top: 2px solid #ccc;
+  width: 100%;
+  background: #6495ed;
+  color: #fff;
+  font-size: 14px;
+}
+
+.footer-content {
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  width: 900px;
+  padding: 10px;
+}
+
+copyright {
+  width: 180px;
+  align-self: center;
+}
+
+.footer-contact-info {
+  display: flex;
+  list-style: none;
+}
+
+.footer-contact-info > li {
+  display: flex;
+  padding: 10px 20px;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+}
+
+.footer-contact-info > li:hover {
+  cursor: pointer;
+}
+
+.footer-content img {
+  display: block;
+  margin: 0 auto;
+  height: 30px;
+  width: 30px;
+  margin-bottom: 2px;
 }

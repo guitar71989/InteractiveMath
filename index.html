@@ -7,7 +7,53 @@
     <script src="./bundle.js" charset="utf-8"></script>
   </head>
   <body>
-    <instructions id="instructions"></instructions>
-    <canvas id="graph-canvas"></canvas>
+
+
+    <header id="header">
+      <nav>
+        <img id="icon" src="assets/cursor.png" alt="icon">
+        <p id="title">
+          Interactive Math
+        </p>
+      </nav>
+    </header>
+
+
+    <main>
+      <instructions id="instructions-text"></instructions>
+
+      <lesson>
+        <canvas id="graph-canvas"></canvas>
+        <score>
+          <div class="score-ctn">
+            <h1 class="score-title">Score</h1>
+            <h1 class="score-result"></h1>
+          </div>
+          <div class="level-ctn">
+            <h1 class="level-title">Level</h1>
+            <h1 class="level-result"></h1>
+          </div>
+          <div class= "lines-ctn">
+            <h1 class="lines-title">Lines</h1>
+            <h1 class="lines-result"></h1>
+          </div>
+        </div>
+        </score>
+      </lesson>
+    </main>
+
+
+    <footer>
+      <content class="footer-content">
+        <copyright>
+          <p>Interactive Math was created by Sam Cross</p>
+        </copyright>
+          <ul class="footer-contact-info">
+            <li class="logo" title="LinkedIn"><a href="https://www.linkedin.com/in/sam-cross" target="_blank"><img src="assets/linkedin.png" alt="LinkedIn"></a><p>LinkedIn</p></li>
+            <li class="logo" title="Github"><a href="https://github.com/guitar71989" target="_blank"><img src="assets/github.png" alt="Github"></a><p>Github</p></li>
+            <li class="logo" title="Github"><a href="https://guitar71989.github.io/" target="_blank"><img src="assets/portfolio.png" alt="Portfolio"></a><p>Portfolio</p></li>
+          </ul>
+        </content>
+    </footer>
   </body>
 </html>
