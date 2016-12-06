@@ -74,11 +74,10 @@
 
 	const Lesson = __webpack_require__(2);
 
-	const LessonView = function(ctx, instructions, score){
+	const LessonView = function(ctx, instructions){
 	    this.lesson = new Lesson;
 	    this.instructions = instructions;
 	    this.ctx = ctx;
-	    this.score = score;
 	  };
 
 	  LessonView.prototype.start = function(){
@@ -101,14 +100,16 @@
 	      const mouseX = Math.floor((e.clientX - func.ctx.canvas.getBoundingClientRect().left - 250) / 20);
 	      const mouseY = Math.floor(13 - (e.clientY - func.ctx.canvas.getBoundingClientRect().top - 10)/ 20);
 	      const mousePos = [mouseX, mouseY];
-
-	      if (this.score === 3) {
+	      
+	      if (func.lesson.score === 3) {
 
 	      } else if(func.lesson.checkAnswer(mousePos)){
-	        this.score += 1;
+	        func.lesson.score += 1;
 	        alert("Correct!");
+
 	        func.lesson.setInstructions(func.instructions);
 	      } else {
+	        func.lesson.score = 0;
 	        alert("Try again!");
 	      }
 	    }.bind(this), false);
@@ -133,14 +134,30 @@
 	  this.pointsArray = [];
 	  this.level = 1;
 	  this.randomPos = null;
+	  this.score = 0;
 	};
 
 	Lesson.prototype.draw = function(ctx){
 	  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 	  this.drawGrid(ctx);
 	  this.plotPoints(ctx);
+	  this.setScore();
 	};
 
+	Lesson.prototype.setScore = function(){
+	  if (this.score === 0){
+	    $('.score-result').html("");
+	  } else if (this.score === 1){
+	    $('.attempt-one').html("&#10004");
+	  } else if (this.score === 2) {
+	    $('.attempt-one').html("&#10004");
+	    $('.attempt-two').html("&#10004");
+	  } else {
+	    $('.attempt-one').html("&#10004");
+	    $('.attempt-two').html("&#10004");
+	    $('.attempt-three').html("&#10004");
+	  }
+	};
 
 	Lesson.prototype.setInstructions = function(instructions){
 	  const plusOrMinus1 = Math.random() < 0.5 ? -1 : 1;

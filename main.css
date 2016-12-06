@@ -99,53 +99,31 @@ canvas:hover {
 
  /* --- Score --- */
 
- .score-ctn, .level-ctn, .lines-ctn {
+ .score-ctn {
    margin: 20px 0;
  }
 
  .score-title {
    display: block;
+   text-align: center;
    background: #000080;
    padding: 20px;
+   font-size: 20px;
    color: #fff;
  }
 
  .score-result {
-   display: block;
+   display: flex;
+   align-items: center;
+   justify-content: center;
    background: #fff;
-   padding: 20px;
+   height: 80px;
+   width: 100px;
    border: 1px solid #ccc;
+   font-size: 40px;
+   text-align: center;
+   color: #00FF00;
  }
-
- .level-title {
-   display: block;
-   background: #000080;
-   padding: 20px;
-   color: #fff;
- }
-
- .level-result {
-   display: block;
-   background: #fff;
-   padding: 20px;
-   border: 1px solid #ccc;
- }
-
- .lines-title {
-   display: block;
-   background: #000080;
-   padding: 20px;
-   color: #fff;
- }
-
- .lines-result {
-   display: block;
-   background: #fff;
-   padding: 20px;
-   border: 1px solid #ccc;
- }
-
-
 
  /* --- Footer --- */
 
