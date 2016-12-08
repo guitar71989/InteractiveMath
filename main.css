@@ -285,11 +285,6 @@ p {
   background: #eee;
 }
 
-#vertical {
-  display: block;
-  padding: 0 40px;
-}
-
 #checkAnswer {
   background: green;
   color: white;
@@ -300,4 +295,9 @@ p {
 #checkAnswer:hover {
   cursor: pointer;
   background: #78AB46;
+}
+
+#num1, #num2, #horizontal, #vertical {
+  display: block;
+  padding: 0 20px;
 }

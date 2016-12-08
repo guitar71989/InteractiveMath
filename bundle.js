@@ -103,8 +103,10 @@
 	    this.handleHover();
 	    this.handleClick();
 
+	    func.lesson.score = 3;
+
 	    setInterval(function(){
-	        func.lesson.draw(func.ctx);
+	      func.lesson.draw(func.ctx);
 
 	      if(func.lesson.score === 3){
 	        func.level += 1;
@@ -437,16 +439,16 @@
 	        <a href="#" onclick="return false" onmousedown="answer('num1', '8')">8</a>
 	        <a href="#" onclick="return false" onmousedown="answer('num1', '9')">9</a>
 	        <a href="#" onclick="return false" onmousedown="answer('num1', '10')">10</a>
-	        <a href="#" onclick="return false" onmousedown="answer('num2', '11')">11</a>
-	        <a href="#" onclick="return false" onmousedown="answer('num2', '12')">12</a>
-	        <a href="#" onclick="return false" onmousedown="answer('num2', '13')">13</a>
-	        <a href="#" onclick="return false" onmousedown="answer('num2', '14')">14</a>
-	        <a href="#" onclick="return false" onmousedown="answer('num2', '15')">15</a>
-	        <a href="#" onclick="return false" onmousedown="answer('num2', '16')">16</a>
-	        <a href="#" onclick="return false" onmousedown="answer('num2', '17')">17</a>
-	        <a href="#" onclick="return false" onmousedown="answer('num2', '18')">18</a>
-	        <a href="#" onclick="return false" onmousedown="answer('num2', '19')">19</a>
-	        <a href="#" onclick="return false" onmousedown="answer('num2', '20')">20</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '11')">11</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '12')">12</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '13')">13</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '14')">14</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '15')">15</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '16')">16</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '17')">17</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '18')">18</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '19')">19</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '20')">20</a>
 	      </div>
 	    </div>
 
