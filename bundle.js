@@ -103,7 +103,6 @@
 	    this.handleHover();
 	    this.handleClick();
 
-	    func.lesson.score = 3;
 
 	    setInterval(function(){
 	      func.lesson.draw(func.ctx);
