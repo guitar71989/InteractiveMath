@@ -48,11 +48,16 @@
 	const Lesson = __webpack_require__(2);
 
 	document.addEventListener('DOMContentLoaded', function(){
-	  //Setup instructions
+
+
+	  const $overlay = $('div#overlay');
+	  const $modal = $('div.modal');
+
+
+	  //Capture instruction area
 	  const instructions = document.getElementById("instructions-text");
 
-	  //Setup graph
-	  let score = 0;
+	  //Capture graph area
 	  const canvas = document.getElementById("graph-canvas");
 	  const ctx = canvas.getContext("2d");
 	  ctx.canvas.width  = 500;
@@ -60,11 +65,17 @@
 	  ctx.canvas.style.width  = '500px';
 	  ctx.canvas.style.height = '500px';
 
+	  document.getElementById('play').addEventListener('click', () => {
+	    $overlay.hide();
+	    $modal.hide();
+	  });
 
-	  const lessonView = new LessonView(ctx, instructions, score);
+
+	  //Setup lesson view
+	  const lessonView = new LessonView(ctx, instructions);
+	  window.lessonView = lessonView;
 	  lessonView.start();
 
-	  window.pointsArray = lessonView.lesson.pointsArray;
 	});
 
 
@@ -72,53 +83,69 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	const Lesson = __webpack_require__(2);
+	const BaseLesson = __webpack_require__(2);
+	const LessonOne = __webpack_require__(4);
 
 	const LessonView = function(ctx, instructions){
-	    this.lesson = new Lesson;
+	    this.lesson = new BaseLesson(instructions);
 	    this.instructions = instructions;
 	    this.ctx = ctx;
+	    this.mousePos = null;
+	    this.level = 1;
+	    this.myHover = this.myHover.bind(this);
+	    this.myClick = this.myClick.bind(this);
 	  };
 
 	  LessonView.prototype.start = function(){
-
 	    const func = this;
-
-	    this.lesson.populatePoints(this.ctx);
-
 	    this.lesson.setInstructions(this.instructions);
-
-	    func.ctx.canvas.addEventListener('mousemove', function(e){
-	      const mouseX = Math.floor((e.clientX - func.ctx.canvas.getBoundingClientRect().left - 250) / 20);
-	      const mouseY = Math.floor(13 - (e.clientY - func.ctx.canvas.getBoundingClientRect().top - 10)/ 20);
-	      const mousePos = [mouseX, mouseY];
-	      func.lesson.checkHover(mousePos);
-	    }, false);
-
-
-	    func.ctx.canvas.addEventListener('click', function(e){
-	      const mouseX = Math.floor((e.clientX - func.ctx.canvas.getBoundingClientRect().left - 250) / 20);
-	      const mouseY = Math.floor(13 - (e.clientY - func.ctx.canvas.getBoundingClientRect().top - 10)/ 20);
-	      const mousePos = [mouseX, mouseY];
-	      
-	      if (func.lesson.score === 3) {
-
-	      } else if(func.lesson.checkAnswer(mousePos)){
-	        func.lesson.score += 1;
-	        alert("Correct!");
-
-	        func.lesson.setInstructions(func.instructions);
-	      } else {
-	        func.lesson.score = 0;
-	        alert("Try again!");
-	      }
-	    }.bind(this), false);
-
+	    this.lesson.populatePoints(this.ctx);
+	    this.handleHover();
+	    this.handleClick();
 
 	    setInterval(function(){
-	      func.lesson.draw(func.ctx);
-	    }, 20);
+	        func.lesson.draw(func.ctx);
 
+	      if(func.lesson.score === 3){
+	        func.level += 1;
+	        func.lesson = new LessonOne(func.instructions);
+	        func.lesson.populatePoints(func.ctx);
+	        func.lesson.setInstructions(func.instructions);
+	        func.handleHover();
+	        func.handleClick();
+	      }
+	    }, 20);
+	  };
+
+	  LessonView.prototype.handleHover = function(){
+	    if (this.level === 1){
+	      this.ctx.canvas.addEventListener('mousemove', this.myHover, false);
+	    } else {
+	      this.ctx.canvas.removeEventListener('mousemove', this.myHover);
+	    }
+
+	  };
+
+	  LessonView.prototype.myHover = function(e){
+	    const mouseX = Math.floor((e.clientX - this.ctx.canvas.getBoundingClientRect().left - 250) / 20);
+	    const mouseY = Math.floor(13 - (e.clientY - this.ctx.canvas.getBoundingClientRect().top - 10)/ 20);
+	    this.mousePos = [mouseX, mouseY];
+	    this.lesson.checkHover(this.mousePos);
+	  };
+
+	  LessonView.prototype.handleClick = function(mousePos){
+	    if (this.level === 1){
+	      this.ctx.canvas.addEventListener('click', this.myClick, false);
+	    } else {
+	      this.ctx.canvas.removeEventListener('click', this.myClick);
+	    }
+	  };
+
+	  LessonView.prototype.myClick = function(e){
+	      const mouseX = Math.floor((e.clientX - this.ctx.canvas.getBoundingClientRect().left - 250) / 20);
+	      const mouseY = Math.floor(13 - (e.clientY - this.ctx.canvas.getBoundingClientRect().top - 10)/ 20);
+	      this.mousePos = [mouseX, mouseY];
+	      this.lesson.handleClick(this.mousePos);
 	  };
 
 	  module.exports = LessonView;
@@ -130,53 +157,35 @@
 
 	const Point = __webpack_require__(3);
 
-	const Lesson = function(){
+	const BaseLesson = function(instructionsEl){
+	  this.instructions = instructionsEl;
 	  this.pointsArray = [];
 	  this.level = 1;
 	  this.randomPos = null;
 	  this.score = 0;
+	  this.answer = null;
 	};
 
-	Lesson.prototype.draw = function(ctx){
+	BaseLesson.prototype.draw = function(ctx){
 	  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 	  this.drawGrid(ctx);
+	  this.placePoints(ctx);
 	  this.plotPoints(ctx);
 	  this.setScore();
 	};
 
-	Lesson.prototype.setScore = function(){
-	  if (this.score === 0){
-	    $('.score-result').html("");
-	  } else if (this.score === 1){
-	    $('.attempt-one').html("&#10004");
-	  } else if (this.score === 2) {
-	    $('.attempt-one').html("&#10004");
-	    $('.attempt-two').html("&#10004");
-	  } else {
-	    $('.attempt-one').html("&#10004");
-	    $('.attempt-two').html("&#10004");
-	    $('.attempt-three').html("&#10004");
-	  }
+
+	BaseLesson.prototype.placePoints = function(ctx){
 	};
 
-	Lesson.prototype.setInstructions = function(instructions){
+	BaseLesson.prototype.randomPoint = function(){
 	  const plusOrMinus1 = Math.random() < 0.5 ? -1 : 1;
 	  const plusOrMinus2 = Math.random() < 0.5 ? -1 : 1;
-
-	  this.randomPos = [Math.floor(Math.random()*12*plusOrMinus1), Math.floor(Math.random()*12*plusOrMinus2)];
-
-	  if(this.level === 1){
-	    instructions.innerHTML = `<p id="instructions">Graph the point (${this.randomPos[0]}, ${this.randomPos[1]}) on the coordinate plane.</p>`;
-
-	  }
+	  return [Math.floor(Math.random()*12*plusOrMinus1), Math.floor(Math.random()*12*plusOrMinus2)];
 	};
 
-	Lesson.prototype.checkAnswer = function(mousePos){
-	  return (this.randomPos[0] === mousePos[0] && this.randomPos[1] === mousePos[1]);
-	};
 
-	Lesson.prototype.drawGrid = function(ctx){
-
+	BaseLesson.prototype.drawGrid = function(ctx){
 	  //Draw vertical gridlines
 	  let idx = 0;
 	  while (idx <= ctx.canvas.height){
@@ -187,14 +196,11 @@
 	    ctx.strokeStyle = "black";
 	    ctx.lineWidth = (idx === 260) ? 1.5 : .5;
 	    ctx.stroke();
-
 	    ctx.fillStyle = "black";
 	    ctx.fillText(`${idx/20 - 13}`, idx - 5, ctx.canvas.height/2 + 25);
 	    ctx.stroke();
-
 	    idx += 20;
 	  }
-
 	  //Draw hortizontal gridlines
 	  idx = 0;
 	  while (idx <= ctx.canvas.width){
@@ -209,109 +215,82 @@
 	    ctx.stroke();
 	    idx += 20;
 	  }
-
 	};
 
+	BaseLesson.prototype.plotPoints = function(ctx){
+	  this.pointsArray.forEach( (point) => {
+	    point.draw(ctx);
+	  });
+	};
 
-	Lesson.prototype.populatePoints = function(ctx){
-	  let idx1 = 0;
+	BaseLesson.prototype.setScore = function(){
+	  if (this.score === 0){
+	    $('.score-result').html("");
+	  } else if (this.score === 1){
+	    $('.attempt-one').html("&#10004");
+	  } else if (this.score === 2) {
+	    $('.attempt-one').html("&#10004");
+	    $('.attempt-two').html("&#10004");
+	  } else {
+	    $('.attempt-one').html("&#10004");
+	    $('.attempt-two').html("&#10004");
+	    $('.attempt-three').html("&#10004");
+	  }
+	};
 
-	  while (idx1 <= ctx.canvas.width){
-	    let idx2 = 0;
-	    while (idx2 <= ctx.canvas.height){
+	BaseLesson.prototype.setInstructions = function(instructions){
+	  const plusOrMinus1 = Math.random() < 0.5 ? -1 : 1;
+	  const plusOrMinus2 = Math.random() < 0.5 ? -1 : 1;
+	  this.randomPos = [Math.floor(Math.random()*12*plusOrMinus1), Math.floor(Math.random()*12*plusOrMinus2)];
+	  if(this.level === 1){
+	    this.instructions.innerHTML = `<p id="instructions">Graph the point (${this.randomPos[0]}, ${this.randomPos[1]}) on the coordinate plane.</p>`;
+	  }
+	};
 
+	BaseLesson.prototype.checkAnswer = function(){
+	  return (this.randomPos[0] === this.answer.graphPos[0] && this.randomPos[1] === this.answer.graphPos[1]);
+	};
+
+	BaseLesson.prototype.populatePoints = function(ctx){
+	  let idx1 = 20;
+	  while (idx1 <= ctx.canvas.width - 20){
+	    let idx2 = 20;
+	    while (idx2 <= ctx.canvas.height - 20){
 	      const newPoint = new Point({
 	        canvasPos: [idx1,idx2],
 	        graphPos: [idx1/20 - 13, 13 - idx2/20],
 	        radius: 3,
 	      });
-
 	      this.pointsArray.push(newPoint);
-
 	      idx2 += 20;
 	    }
 	    idx1 += 20;
 	  }
 	};
 
-	Lesson.prototype.plotPoints = function(ctx){
+	BaseLesson.prototype.checkHover = function(mousePos){
 	  this.pointsArray.forEach( (point) => {
-	    point.draw(ctx);
+	    if (point.isHovered(mousePos)){
+	      point.isHovering = true;
+	    }
+	    else {
+	      point.isHovering = false;
+	    }
 	  });
 	};
 
-	  Lesson.prototype.checkHover = function(mousePos){
-	    this.pointsArray.forEach( (point) => {
-	      if (point.isHovered(mousePos)){
-	        point.isHovering = true;
-	      }
-	      else {
-	        point.isHovering = false;
-	      }
-	    });
-	  };
+	BaseLesson.prototype.handleClick = function(mousePos){
+	  this.pointsArray.filter( (point) => {
+	    if(point.isClicked(mousePos)) {
+	      point.isSelected = true;
+	      this.answer = point;
+	    } else {
+	      point.isSelected = false;
+	    }
+	  });
+	};
 
-	//
-	//
-	// Game.prototype.addAsteroids = function(){
-	//   const newAsteroid = new Asteroid({pos: this.randomPosition(), game: this});
-	//   this.asteroids.push(newAsteroid);
-	// };
-	//
-	//
-	// Game.prototype.remove = function(asteroid){
-	//   const index = this.asteroids.indexOf(asteroid);
-	//   this.asteroids.splice(index, 1);
-	// };
-	//
-	//
-	// Lesson.prototype.step = function(){
-	//     this.moveObjects();
-	//     this.checkCollisions();
-	// };
-	//
-	// Game.prototype.moveObjects = function(){
-	//   this.asteroids.forEach( (asteroid) => {
-	//     asteroid.move();
-	//   });
-	// };
-	//
-	// Game.prototype.randomPosition = function(){
-	//   return [Math.random()*500, Math.random()*500];
-	// };
-	//
-	// Game.prototype.wrap = function(pos){
-	//   let wrappedPos = pos;
-	//   if (pos[0] >= 525){
-	//     wrappedPos[0] = pos[0] % 500;
-	//   } else if (pos[0] <= -25){
-	//     wrappedPos[0] = 500 - (pos[0] % 500);
-	//   } else if (pos[1] >= 525){
-	//     wrappedPos[1] = pos[1] % 500;
-	//   } else if (pos[1] <= -25){
-	//     wrappedPos[1] = 500 - (pos[1] % 500);
-	//   }
-	//   return wrappedPos;
-	// };
-	//
-	// Game.prototype.checkCollisions = function(){
-	//   if (this.asteroids.length <= 1){
-	//     return;
-	//   }
-	//
-	//   for (var i = 0; i < this.asteroids.length; i++) {
-	//     const targetAsteroid = this.asteroids[i];
-	//     const otherAsteroids = this.asteroids.slice(0,i).concat(this.asteroids.slice(i + 1, this.asteroids.length - 1));
-	//     otherAsteroids.forEach( (asteroid) => {
-	//       if (asteroid.isCollidedWith(targetAsteroid)){
-	//         this.remove(asteroid);
-	//         this.remove(targetAsteroid);
-	//       }
-	//     });
-	//   }
-	// };
-
-	module.exports = Lesson;
+	module.exports = BaseLesson;
 
 
 /***/ },
@@ -323,10 +302,18 @@
 	    this.graphPos = options.graphPos;
 	    this.radius = options.radius;
 	    this.isHovering = false;
+	    this.isSelected = false;
 	  };
 
 	  Point.prototype.draw = function(ctx) {
-	    ctx.fillStyle = (this.isHovering) ? "blue" : "#fff";
+	    if (this.isSelected){
+	      ctx.fillStyle = "green";
+	    } else if (this.isHovering){
+	      ctx.fillStyle = "blue";
+	    } else {
+	      ctx.fillStyle = "#fff";
+	    }
+
 	    ctx.beginPath();
 
 	    ctx.arc(
@@ -345,7 +332,195 @@
 	    return (mousePos[0] === this.graphPos[0]) && (mousePos[1] === this.graphPos[1]);
 	  };
 
+	  Point.prototype.isClicked = function(mousePos){
+	    return (mousePos[0] === this.graphPos[0]) && (mousePos[1] === this.graphPos[1]);
+	  };
+
+	  Point.prototype.labelPoint = function(ctx, label){
+	    ctx.strokeStyle = "blue";
+	    ctx.lineWidth = 1;
+	    ctx.strokeText(`${label}`, this.canvasPos[0] + 5, this.canvasPos[1] + 5);
+	  };
+
+
 	module.exports = Point;
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	const Point = __webpack_require__(3);
+	const Util = __webpack_require__(5);
+	const BaseLesson = __webpack_require__(2);
+
+	const LessonOne = function (instructions) {
+	  this.instructions = instructions;
+	  this.pointsArray = [];
+	  this.randomPos = null;
+	  this.score = 0;
+	  this.handleClick = this.handleClick.bind(this);
+	  this.answer = {};
+	  this.pointA = null;
+	  this.pointB = null;
+	};
+
+	Util.inherits(LessonOne, BaseLesson);
+
+
+	LessonOne.prototype.placePoints = function(ctx, firstPoint){
+	  this.pointA.labelPoint(ctx, "A");
+	  this.pointB.labelPoint(ctx, "B");
+	};
+
+
+	LessonOne.prototype.placePoint = function(){
+	  const idx = Math.floor(Math.random() * 576);
+	  this.pointsArray[idx].isHovering = true;
+	  const pointArray = this.pointsArray.slice(idx, idx + 1);
+	  const point = pointArray[0];
+	  return point;
+	};
+
+	LessonOne.prototype.checkAnswer = function(ctx, firstPoint){
+	  const ver = this.pointB.graphPos[1] - this.pointA.graphPos[1];
+	  const hor = this.pointB.graphPos[0] - this.pointA.graphPos[0];
+	  if (ver < 0 && this.answer.vertical === "Up"){
+	    return false;
+	  } else if (ver > 0 && this.answer.vertical === "Down"){
+	    return false;
+	  } else if (hor > 0 && this.answer.hortizontal === "Left"){
+	    return false;
+	  } else if (hor < 0 && this.answer.hortizontal === "Right"){
+	    return false;
+	  }
+
+	  return parseInt(this.answer.num1) === Math.abs(ver) && parseInt(this.answer.num2) === Math.abs(hor);
+	};
+
+
+	LessonOne.prototype.setInstructions = function(instructions){
+	  if (this.pointA) {
+	    this.pointA.isHovering = false;
+	    this.pointB.isHovering = false;
+	  }
+
+	  this.pointA = this.placePoint();
+	  this.pointB = this.placePoint();
+
+	  this.instructions.innerHTML =
+	  `<div id="instructions">
+	  <p>To get from point A to point B, you need to move</p>
+
+	    <div class="dropdown">
+	      <a id="vertical" href="#" onclick="return false;" onmousedown="dropMenu('myDropdown1')">
+	        Select
+	      </a>
+	      <div id="myDropdown1" class="dropdown-content">
+	        <a href="#" onclick="return false" onmousedown="answer('vertical','Up')">Up</a>
+	        <a href="#" onclick="return false" onmousedown="answer('vertical', 'Down')">Down</a>
+	          <a href="#" onclick="return false" onmousedown="answer('vertical', 'N/A')">N/A</a>
+	      </div>
+	    </div>
+
+	    <div class="dropdown">
+	    <a id="num1" href="#" onclick="return false;" onmousedown="dropMenu('myDropdown2')">Select</a>
+	      <div id="myDropdown2" class="dropdown-content">
+	        <a href="#" onclick="return false" onmousedown="answer('num1','0')">0</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '1')">1</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '2')">2</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '3')">3</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '4')">4</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '5')">5</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '6')">6</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '7')">7</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '8')">8</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '9')">9</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num1', '10')">10</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '11')">11</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '12')">12</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '13')">13</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '14')">14</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '15')">15</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '16')">16</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '17')">17</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '18')">18</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '19')">19</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '20')">20</a>
+	      </div>
+	    </div>
+
+	  <p>and</p>
+
+	    <div class="dropdown">
+	    <a id="horizontal" href="#" onclick="return false;" onmousedown="dropMenu('myDropdown3')">Select</a>
+	      <div id="myDropdown3" class="dropdown-content">
+	        <a href="#" onclick="return false" onmousedown="answer('horizontal','Left')">Left</a>
+	        <a href="#" onclick="return false" onmousedown="answer('horizontal', 'Right')">Right</a>
+	        <a href="#" onclick="return false" onmousedown="answer('horizontal', 'N/A')">N/A</a>
+	      </div>
+	    </div>
+
+	    <div class="dropdown">
+	    <a id="num2" href="#" onclick="return false;" onmousedown="dropMenu('myDropdown4')">Select</a>
+	      <div id="myDropdown4" class="dropdown-content">
+	        <a href="#" onclick="return false" onmousedown="answer('num2','0')">0</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '1')">1</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '2')">2</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '3')">3</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '4')">4</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '5')">5</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '6')">6</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '7')">7</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '8')">8</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '9')">9</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '10')">10</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '11')">11</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '12')">12</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '13')">13</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '14')">14</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '15')">15</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '16')">16</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '17')">17</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '18')">18</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '19')">19</a>
+	        <a href="#" onclick="return false" onmousedown="answer('num2', '20')">20</a>
+	      </div>
+	    </div>
+
+	  </div>`;
+
+
+
+	};
+
+
+	module.exports = LessonOne;
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	const Util = {
+
+	  inherits (ChildClass, BaseClass) {
+	    function Surrogate () { this.constructor = ChildClass; }
+	    Surrogate.prototype = BaseClass.prototype;
+	    ChildClass.prototype = new Surrogate();
+	  },
+
+	  randomVec (length) {
+	    const deg = 2 * Math.PI * Math.random();
+	    return Util.scale([Math.sin(deg), Math.cos(deg)], length);
+	  },
+
+	  scale (vec, m) {
+	    return [vec[0] * m, vec[1] * m];
+	  }
+	};
+
+	module.exports = Util;
 
 
 /***/ }

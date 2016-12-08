@@ -20,6 +20,58 @@
    background: transparent;
  }
 
+
+
+
+#overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, .5);
+}
+
+
+
+  .modal {
+    align-self: center;
+    justify-content: center;
+    flex-direction: column;
+    background:rgba(0,0,0,0.2);
+    border-radius: 5px;
+    border: 3px solid #000;
+    background: #fff;
+    padding: 20px;
+    font-size: 16px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    vertical-align: center;
+    height: 300px;
+    width: 600px;
+    margin-left: -300px;
+    margin-top: -300px;
+  }
+
+  .modal a {
+    display: block;
+    margin-top: 50px;
+    padding: 10px;
+    background: green;
+    color: white;
+  }
+
+  .modal a:hover {
+    cursor: pointer;
+    background: #78AB46;
+  }
+
+.modal-paragraph {
+  display: block;
+  margin-top: 10px;
+}
+
+
  /* --- Body --- */
 
 body {
@@ -118,7 +170,7 @@ canvas:hover {
    justify-content: center;
    background: #fff;
    height: 80px;
-   width: 100px;
+   width: 120px;
    border: 1px solid #ccc;
    font-size: 40px;
    text-align: center;
@@ -172,4 +224,80 @@ copyright {
   height: 30px;
   width: 30px;
   margin-bottom: 2px;
+}
+
+
+p {
+  display: inline;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  width: 80px;
+  border-radius: 5px;
+  padding: 2px;
+  border: 1px solid #000;
+}
+
+.dropdown > a {
+  display: block;
+}
+
+.dropdown:hover {
+  cursor: pointer;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 18px;
+  left: -1px;
+  width: 76px;
+  background-color: white;
+  padding: 4px;
+  color: #000;
+  border-bottom: 1px solid #000;
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.dropdown-content > a {
+  display: block;
+  padding: 5px;
+}
+
+.dropdown-content > a {
+  border-bottom: 1px solid #ccc;
+}
+
+.dropdown-content > a:last-child {
+  border-bottom: none;
+}
+
+.dropdown-content > a:hover {
+  background: #eee;
+}
+
+#vertical {
+  display: block;
+  padding: 0 40px;
+}
+
+#checkAnswer {
+  background: green;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+#checkAnswer:hover {
+  cursor: pointer;
+  background: #78AB46;
 }

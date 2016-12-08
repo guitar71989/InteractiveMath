@@ -6,8 +6,45 @@
     <link rel="stylesheet" href="main.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="./bundle.js" charset="utf-8"></script>
+
+    <script type="text/javascript">
+
+      function dropMenu(x){
+        const dropdownArray = ["myDropdown1", "myDropdown2", "myDropdown3", "myDropdown4"];
+
+        for (var idx in dropdownArray) {
+          if (dropdownArray[idx] != x){
+            document.getElementById(dropdownArray[idx]).style.display = "none";
+          } else if (document.getElementById(dropdownArray[idx]).style.display === "block") {
+            document.getElementById(dropdownArray[idx]).style.display = "none";
+          } else {
+            document.getElementById(dropdownArray[idx]).style.display = "block";
+          }
+        }
+      }
+
+      function processAnswer(){
+        if (window.lessonView.lesson.checkAnswer()){
+          window.lessonView.lesson.score += 1;
+          alert("Correct")
+        } else {
+          alert("Try again!");
+          window.lessonView.lesson.score = 0;
+        };
+        window.lessonView.lesson.setInstructions(this.instructions);
+      }
+
+      function answer(question, answer){
+        window.lessonView.lesson.answer[question] = answer;
+        $('#' + `${question}`).html(answer);
+        $('.dropdown-content').css('display', "none");
+      }
+
+    </script>
   </head>
+
   <body>
+
 
 
     <header id="header">
@@ -19,6 +56,30 @@
       </nav>
     </header>
 
+    <div id="overlay">
+      <div class="modal">
+        <h1 id="modal-title">Welcome to Interactive Math!</h1>
+
+        <p class="modal-paragraph">Coordinate planes enable humans to describe algebraic
+          relationships in a visual sense, and also help us create
+          and interpret algebraic concepts.
+        </p>
+
+        <p class="modal-paragraph">Not only are coordinate planes important for math, but in
+          every profession, they help humans describe information visually. Being able to
+          properly analyze them is an essential skill, whether you're
+          a business person, doctor, or teacher.
+        </p>
+
+        <p class="modal-paragraph">If you have any questions, please feel free to e-mail
+          at samuel.harrison.cross@gmail.com. Enjoy!
+        </p>
+
+        <a id="play" >Ok thanks, let's go!</a>
+      </div>
+    </div>
+
+
 
     <main>
       <instructions id="instructions-text"></instructions>
@@ -26,13 +87,15 @@
       <lesson>
         <canvas id="graph-canvas"></canvas>
         <score>
+          <div id="checkAnswer" onclick="return false" onmousedown="processAnswer()">
+            Submit Answer
+          </div>
           <div class="score-ctn">
             <h1 class="score-title">Score</h1>
             <div class="score-result attempt-one"></p></div>
             <div class="score-result attempt-two"></p></div>
             <div class="score-result attempt-three"></p></div>
           </div>
-        </div>
         </score>
       </lesson>
     </main>
